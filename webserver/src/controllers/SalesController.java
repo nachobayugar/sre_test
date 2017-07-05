@@ -74,7 +74,7 @@ public class SalesController extends MainController{
 			//Validación: si el usuario no es de tipo seller, entonces devuelve error, 
 			//porque no es necesario devolver el monto de los items.
 			if(!"seller".equals((String) responseBody.get("user_type"))){
-				//Si no es seller retorna error
+				//Si no es seller no retorna 200
 				setResponseBody("{'message':'user is not seller'}");
 				setResponseStatus(500);
 				setResponseHeader("content-type", "application/json");
