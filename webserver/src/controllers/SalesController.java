@@ -71,6 +71,20 @@ public class SalesController extends MainController{
 			finalResponse.put("totalAmount", totalAmount);
 			
 			//--------------------------------------------------------------------
+			//Obtención de tasa de cambio a dolares
+			requestProperties.put("uriWithQueryString", "/currency_conversions?from=USD&to=ARS");
+			response = HttpClient.executeRequest(requestProperties);
+			responseStatus = (Integer) response.get("status");
+			if(responseStatus>201){
+				setServiceFailedResponse("could not get currency information");
+				return;
+			}
+			Map currencyInfo = (Map) response.get("body");
+			Double conversionRate = (Double) currencyInfo.get("rate");
+			Double totalAmountUSD = totalAmount/conversionRate;
+			finalResponse.put("totalAmountUSD", totalAmountUSD);
+			
+			//--------------------------------------------------------------------
 			//Validación: si el usuario no es de tipo seller, entonces devuelve error, 
 			//porque no es necesario devolver el monto de los items.
 			if(!"seller".equals((String) responseBody.get("user_type"))){
@@ -83,7 +97,7 @@ public class SalesController extends MainController{
 			
 			//------------------------------------------------------------------- 
 			//Notificación del monto total que se va a devolver
-			notifyResponse(userId, totalAmount);
+			notifyResponse(userId, totalAmountUSD);
 			
 			//-------------------------------------------------------------------
 			//Seteo de respuesta
